@@ -1,0 +1,187 @@
+import { useState } from 'react';
+import { Meta, Story, Preview } from '@storybook/addon-docs/blocks';
+import { Props } from '@storybook/addon-docs/blocks';
+import { withA11y } from '@storybook/addon-a11y';
+import styled from 'styled-components';
+import Alert from '../src/components/Alert/AlertComponent';
+
+
+<Meta 
+  title="Alert" 
+  component={Alert}
+  decorators={[(storyFn) => <div style={{ width: '500px', margin: '0' }}>{storyFn()}</div>]}
+/>
+
+# Alert
+#### Contextual feedback messages for user actions.
+
+## Overview
+Alert can have different styles to signify the type of alert it is. 
+
+<Preview>
+  <Story name="Overview" decorators={[ withA11y,  ]}>
+    <>
+      <Alert type="primary">
+        Primary alert <a href="https://www.google.com">link</a> with link example
+      </Alert>
+      <Alert type="secondary">Secondary alert</Alert>
+      <Alert type="success">Success alert</Alert>
+      <Alert type="warning">Warning alert</Alert>
+      <Alert type="danger">Danger alert</Alert>
+      <Alert type="info">Info alert</Alert>
+    </>
+  </Story>
+</Preview>
+
+## Props 
+<Props of={Alert} />
+
+## Closable alert
+Alert can be closable. If the <b>closable</b> prop is passed in, the alert component will display a close icon with accessible label text of 'close' by default. You can pass in an additional <b>closeLabel</b> prop to specify the content for the accessible label text.
+
+You can also pass in a custom <b>onClose</b> function to be called when user clicks on the close icon
+
+<Preview>
+  <Story name="Closable">
+    {
+      () => {
+        const [type, setType] = useState('default');
+        return (
+          <>
+            <Alert type="primary" closable>Default label text</Alert>
+            <Alert type="success" closable closeLabel="Close here">Custom label text</Alert>
+            <Alert type="info" closable onClose={() => setType('New!')}>Custom close function</Alert>
+            { console.log('type', type) }
+          </>
+        )
+      }
+    }
+   
+  </Story>
+</Preview>
+
+
+## Alert with header and custom elements
+More complicated alert can be achieved by composing with Alert header and any other element or React component
+<Preview>
+  <Story name="Header & Custom Elements">
+    <Alert closable>
+      <Alert.Header>Hello World</Alert.Header>
+      <p>Welcome to all things Alert related</p>
+    </Alert>
+  </Story>
+</Preview>
+
+## Alert accessibility
+By default the alert component will set the role to <b>alert</b>. But it also allows for custom arial attributes to better represent certain content.
+
+Acceptable arial attributes are as follow:
+* role
+* arial-labelledby
+* arial-describedby
+
+They can be passed in to the alert component in an object to the <b>accessibility</b> prop.
+ex.
+````
+{
+  role: 'alertdialog',
+  arialLabelledby: 'dialog1Title',
+  arialDescribedby: 'dialog1Desc',
+}
+````
+
+
+### Non-urgent information alert that does not require user immediate attention
+If the information does not require immediate user attention, a <b>region</b> role and arial-live tag of <b>polite</b> maybe better suited
+
+### Urgent user interaction required
+If an alert notification requires immediate user interaction (such as cancel or close) the <b>alertdialog</b> role should be used instead of the alert role.
+
+The alert dialog must always be given an accessible name (through <i>aria-labelledby</i> or <i>aria-label</i>) , and in most cases the alert text will have to be marked up as the alert dialog's accessible description (using aria-describedby).
+<Preview>
+  <Story name="Accessibilty">
+    <>
+      <Alert accessibility={{
+        role: 'region',
+        arialLive: 'polit'
+      }} type="info">
+        <Alert.Header>This is some information</Alert.Header>
+        <p>Information that is not urgent and does not require user interaction</p>
+      </Alert>
+  
+      <Alert accessibility={{
+        role: 'alertdialog',
+        arialLabelledby: 'dialog1Title',
+        arialDescribedby: 'dialog1Desc',
+        }} type="danger" closable>
+        <div role="document" tabIndex="0">
+          <Alert.Header id="dialog1Title">Urgent! Your login session is about to expire</Alert.Header>
+          <p id="dialog1Desc">To extend your session, click the OK button</p>
+          <button>OK</button>
+          <button >cancel</button>
+        </div>
+      </Alert>
+    </>
+  </Story>
+</Preview>
+
+## State control
+You can control the <b>show</b> state of the alert
+<Preview>
+  <Story name="State control">
+    {
+      () => {
+        const [show, setShow] = useState(false);
+        return (
+          <>
+            <Alert show={show} type="danger">
+              <div role="document" tabIndex="0">
+                <Alert.Header>Your login session is about to expire</Alert.Header>
+                <p>To extend your session, click the OK button</p>
+                <button onClick={() => {alert('custom action!'); setShow(false);}}>OK</button>
+                <button onClick={() => setShow(false)}>cancel</button>
+              </div>
+            </Alert>
+            {!show && <button onClick={() => setShow(true)}>Show Alert</button>}
+          </>
+        );
+      }
+    }
+  </Story>
+</Preview>
+
+## Custom styles
+You can override any default styles with the customStyles prop.
+<Preview>
+  <Story name="Custom styles">
+    {
+      () => {
+        const customStyles = `
+          background: purple;
+          color: yellow;
+          font-size: 1.5rem;
+          & button {
+            padding: .80rem 1.25rem
+          }
+          & svg {
+            fill: yellow;
+            width: 1.5rem;
+            height: 1.5rem;
+          }
+          &:hover {
+            & svg {
+              & path {
+                stroke: yellow;
+              }
+            }
+          }
+        `;
+        return (
+          <Alert customStyles={customStyles} closable>Hello World</Alert>
+        );
+      }
+    }
+    
+  </Story>
+</Preview>
+
